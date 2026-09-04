@@ -1,6 +1,7 @@
 package com.historicalrpg.research.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -8,6 +9,7 @@ import com.historicalrpg.research.dto.ResearchItemRequest;
 import com.historicalrpg.research.dto.ResearchItemResponse;
 import com.historicalrpg.research.entity.ResearchItem;
 import com.historicalrpg.research.entity.ResearchStatus;
+import com.historicalrpg.research.exception.ResearchItemCodeMismatchException;
 import com.historicalrpg.research.repository.ResearchItemRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -38,5 +40,20 @@ class ResearchItemServiceTest {
         assertThat(response.status()).isEqualTo(ResearchStatus.COMPLETE);
         assertThat(item.getSummary()).isEqualTo("Reviewed notes");
         verify(repository).findByCode("RES-200");
+    }
+
+    @Test
+    void rejectsUpdateWhenCodesDoNotMatch() {
+
+        ResearchItemRequest request = new ResearchItemRequest(
+                "RES-201",
+                "Updated title",
+                ResearchStatus.COMPLETE,
+                "Reviewed notes");        
+
+        assertThatThrownBy(() ->
+            service.update("RES-200", request))
+                .isInstanceOf(ResearchItemCodeMismatchException.class)
+                .hasMessageContaining("must match");
     }
 }

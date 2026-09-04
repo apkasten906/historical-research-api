@@ -25,4 +25,10 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(ApiErrorResponse.validation(errors));
     }
+
+    @ExceptionHandler(ResearchItemCodeMismatchException.class)
+    public ResponseEntity<ApiErrorResponse> handleCodeMismatch(ResearchItemCodeMismatchException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.of(400, ex.getMessage()));
+    }
 }
