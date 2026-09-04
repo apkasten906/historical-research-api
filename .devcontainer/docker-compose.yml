@@ -1,0 +1,46 @@
+name: historicalfigures-api
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace:cached
+      - maven-cache:/home/vscode/.m2
+      - codex-data:/home/vscode/.codex
+    command: sleep infinity
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: historical_rpg
+      DB_USERNAME: rpg
+      DB_PASSWORD: rpg
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: historical_rpg
+      POSTGRES_USER: rpg
+      POSTGRES_PASSWORD: rpg
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rpg -d historical_rpg"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
+    name: historicalfigures-api-postgres-data
+  maven-cache:
+    name: historicalfigures-api-maven-cache
+  codex-data:
+    name: historicalfigures-api-codex-data

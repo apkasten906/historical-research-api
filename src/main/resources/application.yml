@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: historicalfigures-api
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:historical_rpg}
+    username: ${DB_USERNAME:rpg}
+    password: ${DB_PASSWORD:rpg}
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: info
+
+server:
+  port: 8080

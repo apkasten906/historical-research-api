@@ -1,0 +1,30 @@
+giot# Maven build output
+target/
+
+# Local source archive (the source tree itself is tracked)
+/src.zip
+
+# Java and IDE-generated files
+*.class
+*.iml
+.idea/
+.classpath
+.project
+.settings/
+.factorypath
+bin/
+out/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and JVM crash reports
+*.log
+hs_err_pid*
+replay_pid*
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
