@@ -18,6 +18,34 @@ Java, Maven, and PostgreSQL run inside Docker.
 
 Open this folder in VS Code and choose **Reopen in Container** when prompted.
 
+Your Git identity is restored on every container start, including after a rebuild.
+Copy `.env.example` to `.env.local` in the project root and set `GIT_USER_NAME`
+and `GIT_USER_EMAIL`. The local file is ignored by Git and stays in your host
+workspace across rebuilds. It is sourced by Bash, so use quoted Bash assignments.
+To apply changes in a running container, run `bash .devcontainer/post-start.sh`.
+
+When opening this project directly from Windows, VS Code runs
+`.devcontainer/update-wsl.ps1` on the host before starting the container. It runs
+[`wsl --update`](https://learn.microsoft.com/en-us/windows/wsl/basic-commands#update-wsl)
+to check for and install available WSL updates, then shows an eight-second Windows
+popup. Progress and results also appear in **Dev Containers: Show Container Log**.
+This checks WSL itself; Linux distribution packages have their own updates.
+
+If the update fails or returns a reboot-required status, container startup stops.
+Follow the popup instructions and retry; Windows may require administrator rights
+for the update. The script does not shut down WSL or restart Windows automatically.
+The hook can also run when reopening an existing container. Starting services
+manually with Docker Compose bypasses this VS Code hook.
+
+To run the same check manually from Windows PowerShell in the project root:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .devcontainer/update-wsl.ps1
+```
+
+The startup hook requires Windows PowerShell on the host, matching this project's
+Windows-based workflow.
+
 The Dev Container starts two Docker Compose services:
 
 - `app`: Java 21, Maven, Git, common command-line utilities, source code, and development tools
