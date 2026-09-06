@@ -1,7 +1,7 @@
 package com.historicalrpg.research.controller;
 
 import com.historicalrpg.research.dto.HistoricalEventResponse;
-import com.historicalrpg.research.repository.HistoricalEventRepository;
+import com.historicalrpg.research.service.HistoricalEventService;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,16 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/events")
 public class HistoricalEventController {
 
-    private final HistoricalEventRepository historicalEventRepository;
+    private final HistoricalEventService historicalEventService;
 
-    public HistoricalEventController(HistoricalEventRepository historicalEventRepository) {
-        this.historicalEventRepository = historicalEventRepository;
+    public HistoricalEventController(HistoricalEventService historicalEventService) {
+        this.historicalEventService = historicalEventService;
     }
 
     @GetMapping
     public List<HistoricalEventResponse> findAll() {
-        return historicalEventRepository.findAll().stream()
-                .map(HistoricalEventResponse::fromEntity)
-                .toList();
+        return historicalEventService.findAll();
     }
 }
