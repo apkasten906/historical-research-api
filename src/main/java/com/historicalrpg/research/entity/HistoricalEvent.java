@@ -46,8 +46,16 @@ public class HistoricalEvent {
         return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {        
+        this.title = title;
     }
 
     public LocalDate getEventDate() {
@@ -62,7 +70,12 @@ public class HistoricalEvent {
         return location;
     }
 
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
     public Set<Person> getPeople() {
         return people;
-    }
+    }    
+    
 }

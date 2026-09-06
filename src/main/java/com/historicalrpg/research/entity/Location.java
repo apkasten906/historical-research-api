@@ -33,6 +33,10 @@ public class Location {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;    
+    }
+
     public String getLocationType() {
         return locationType;
     }
@@ -44,4 +48,6 @@ public class Location {
     public String getNotes() {
         return notes;
     }
+
+    
 }
