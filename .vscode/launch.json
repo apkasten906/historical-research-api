@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-HistoricalFiguresApiApplication<research>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.historicalrpg.research.HistoricalFiguresApiApplication",
+            "projectName": "research",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
