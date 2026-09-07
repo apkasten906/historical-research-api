@@ -5,6 +5,18 @@ param()
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+function Get-WslPath {
+    $systemWsl = Join-Path $env:WINDIR 'System32\wsl.exe'
+    if (Test-Path -LiteralPath $systemWsl) {
+        return $systemWsl
+    }
+
+    $command = Get-Command wsl.exe -CommandType Application -ErrorAction Stop |
+        Select-Object -First 1
+
+    return $command.Source
+}
+
 function Show-UpdateNotification {
     param(
         [string]$Message,
@@ -30,21 +42,21 @@ function Show-UpdateNotification {
 }
 
 try {
-    $wsl = (Get-Command wsl.exe -CommandType Application -ErrorAction Stop).Source
+    $wsl = Get-WslPath
     Write-Host '[WSL update] Checking for and installing WSL updates before container startup...'
     # Inherit console output so progress and any Windows prompts remain visible.
     $update = Start-Process -FilePath $wsl -ArgumentList '--update' -NoNewWindow -Wait -PassThru
     if ($update.ExitCode -eq 3010) {
-        Show-UpdateNotification -Failed $true -Message 'WSL requested a Windows reboot. Restart Windows, then reopen the project in the container. Container startup has stopped.'
-        exit 1
+        Show-UpdateNotification -Failed $true -Message 'WSL requested a Windows reboot. Restart Windows before using the container if WSL behaves unexpectedly. Container startup will continue.'
+        exit 0
     }
     if ($update.ExitCode -ne 0) {
         throw "wsl --update exited with code $($update.ExitCode)."
     }
 }
 catch {
-    Show-UpdateNotification -Failed $true -Message "WSL update failed. Container startup has stopped. $($_.Exception.Message) See the Dev Containers log. Run 'wsl --update' in Windows PowerShell (as Administrator if required), then retry."
-    exit 1
+    Show-UpdateNotification -Failed $true -Message "WSL update failed. Container startup will continue. $($_.Exception.Message) See the Dev Containers log. Run 'wsl --update' in Windows PowerShell as Administrator if needed."
+    exit 0
 }
 
 Show-UpdateNotification -Message 'WSL update check completed successfully; any available update was installed. Continuing container startup. If WSL reported that a restart is required, restart Windows before using the container.'

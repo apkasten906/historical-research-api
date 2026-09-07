@@ -31,11 +31,12 @@ to check for and install available WSL updates, then shows an eight-second Windo
 popup. Progress and results also appear in **Dev Containers: Show Container Log**.
 This checks WSL itself; Linux distribution packages have their own updates.
 
-If the update fails or returns a reboot-required status, container startup stops.
-Follow the popup instructions and retry; Windows may require administrator rights
-for the update. The script does not shut down WSL or restart Windows automatically.
-The hook can also run when reopening an existing container. Starting services
-manually with Docker Compose bypasses this VS Code hook.
+If the update fails or returns a reboot-required status, container startup
+continues and the script shows a warning. Follow the popup instructions after
+the container opens; Windows may require administrator rights for the update. The
+script does not shut down WSL or restart Windows automatically. The hook can also
+run when reopening an existing container. Starting services manually with Docker
+Compose bypasses this VS Code hook.
 
 To run the same check manually from Windows PowerShell in the project root:
 
