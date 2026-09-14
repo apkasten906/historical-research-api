@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -57,6 +58,16 @@ public class ResearchItem {
             joinColumns = @JoinColumn(name = "research_item_id"),
             inverseJoinColumns = @JoinColumn(name = "location_id"))
     private Set<Location> locations = new LinkedHashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "research_item_claim",
+            joinColumns = @JoinColumn(name = "research_item_id"),
+            inverseJoinColumns = @JoinColumn(name = "claim_id"))
+    @OrderBy("id ASC")
+    private Set<Claim> claims = new LinkedHashSet<>();
+
+    public Set<Claim> getClaims() { return claims; }
 
     @PrePersist
     void onCreate() {

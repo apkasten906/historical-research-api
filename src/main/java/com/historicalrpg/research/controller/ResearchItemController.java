@@ -1,6 +1,7 @@
 package com.historicalrpg.research.controller;
 
 import com.historicalrpg.research.dto.ResearchItemRequest;
+import com.historicalrpg.research.dto.ResearchItemClaimsResponse;
 import com.historicalrpg.research.dto.ResearchItemResponse;
 import com.historicalrpg.research.service.ResearchItemService;
 import jakarta.validation.Valid;
@@ -34,6 +35,11 @@ public class ResearchItemController {
     @GetMapping("/{code}")
     public ResearchItemResponse findByCode(@PathVariable String code) {
         return researchItemService.findByCode(code);
+    }
+
+    @GetMapping("/{code}/claims")
+    public ResearchItemClaimsResponse findClaimsByCode(@PathVariable String code) {
+        return researchItemService.findClaimsByCode(code);
     }
 
     @PostMapping

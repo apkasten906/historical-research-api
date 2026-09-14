@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -42,6 +43,13 @@ public class HistoricalEvent {
             inverseJoinColumns = @JoinColumn(name = "person_id"))
     private Set<Person> people = new LinkedHashSet<>();
 
+    // Populated by the database compatibility trigger; refresh after a new insert.
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "entity_id", insertable = false, updatable = false)
+    private KnowledgeEntity knowledgeEntity;
+
+    public KnowledgeEntity getKnowledgeEntity() { return knowledgeEntity; }
+
     public Long getId() {
         return id;
     }
@@ -54,7 +62,7 @@ public class HistoricalEvent {
         return title;
     }
 
-    public void setTitle(String title) {        
+    public void setTitle(String title) {
         this.title = title;
     }
 
@@ -76,6 +84,6 @@ public class HistoricalEvent {
 
     public Set<Person> getPeople() {
         return people;
-    }    
-    
+    }
+
 }

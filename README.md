@@ -187,3 +187,69 @@ mvn package
 ```
 
 The repository test uses the Compose PostgreSQL database because this project is meant to teach the real PostgreSQL-backed stack from the start.
+
+## Historical Knowledge Base (KB-001)
+
+PostgreSQL is the canonical database of record. A future Neo4j graph, vector
+index, or CIDOC CRM/RDF export will be a derived projection, not a competing
+source of truth. These integrations are outside this implementation.
+
+`V4__add_knowledge_base_core.sql` adds the knowledge base without modifying
+V1–V3, existing primary keys, or legacy junction tables:
+
+- `entity` provides a stable UUID, type, name, and description for claim subjects
+  and objects. `entity_alias` stores alternative names with optional language and
+  alias type; lookup supports case-insensitive searches, and duplicate aliases
+  for the same entity/language/type are rejected (including absent metadata).
+- Existing people, locations, and events each receive a distinct entity, even
+  when names match. Their `entity_id` links are unique and mandatory. Database
+  triggers also create links for future legacy inserts and mirror name/description
+  updates. Typed rows own these mirrored fields. JPA exposes a read-only
+  `knowledgeEntity` association; flush and refresh a newly inserted typed row
+  before accessing its database-generated link. Deleting a typed row retains
+  its generic entity so that claims and their provenance remain available.
+- `source` holds bibliographic metadata; `citation` holds a locator and optional
+  extract within that source. `sourceType` is an extensible string, for example
+  `BOOK`, `ARTICLE`, `PRIMARY_DOCUMENT`, `ARCHIVAL_ITEM`, `WEBSITE`, or `PODCAST`.
+- `claim` stores a subject, predicate, and exactly one entity object or literal
+  value. `claimType` (`HISTORICAL_FACT`, `HISTORICAL_INFERENCE`, `GAME_INVENTION`)
+  is separate from `evidenceStatus` (`DOCUMENTED`, `PROBABLE`, `PLAUSIBLE`,
+  `SPECULATIVE`, `DISPUTED`, `FICTIONAL`). Neither dimension is derived from the
+  legacy `historical` flag or narrative notes.
+- `validFrom`/`validTo` describe historical time, independently of record creation
+  and update timestamps. Either bound may be absent. `datePrecision` is an
+  extensible string such as `EXACT`, `CIRCA`, `BEFORE`, `AFTER`, or `RANGE`;
+  `dateNote` preserves the researcher's uncertainty. Supplied ranges must be
+  ordered. No precision is inferred from the date values.
+- `claim_evidence` relates citations to claims as `SUPPORTS`, `CONTRADICTS`, or
+  `CONTEXT`, with optional strength and notes. Opposing evidence may coexist;
+  the API does not automatically resolve conflicts or change evidence status.
+- `research_item_claim` lets multiple research items share a claim. Deleting a
+  research item removes its links, not the underlying claims or sources.
+
+Read an item's claims with:
+
+```bash
+curl http://localhost:8080/api/research-items/RES-095/claims
+```
+
+The response includes `code`, `title`, and a `claims` array. Each claim exposes
+its `publicId`, `subject` and optional `object` (`publicId`, `name`, `type`),
+`predicate`, optional `literalValue`, both classification dimensions, historical
+date metadata, notes, and `evidence`. Each evidence entry includes its type,
+strength, notes, and a `citation` containing the locator, extract, and nested
+bibliographic `source`. Existing items without claims return an empty array;
+unknown codes return 404. DTOs are mapped within a read-only service transaction
+with Open Session in View disabled. There is no generic knowledge-base write API
+yet; the JPA model and repositories support persistence.
+
+V4 seeds no sources, citations, or claims. All new historical-shaped assertions
+in tests are synthetic. RES-065 — Wolfgang von Polheim remains the first planned
+real ingestion/validation case before bulk ingestion of the Bruges 1488 corpus.
+
+The test suite includes a V3-to-V4 upgrade in a temporary PostgreSQL schema,
+legacy insert/update compatibility, claim persistence and constraints, shared
+claims, conflicting citations, and real HTTP-controller serialization after the
+fixture transaction has closed. It requires the same PostgreSQL connection as
+the existing repository tests. The migration test drops only its own temporary
+schema; other test fixtures are rolled back or explicitly removed.

@@ -1,6 +1,7 @@
 package com.historicalrpg.research.service;
 
 import com.historicalrpg.research.dto.ResearchItemRequest;
+import com.historicalrpg.research.dto.ResearchItemClaimsResponse;
 import com.historicalrpg.research.dto.ResearchItemResponse;
 import com.historicalrpg.research.entity.ResearchItem;
 import com.historicalrpg.research.exception.ResearchItemCodeMismatchException;
@@ -33,6 +34,13 @@ public class ResearchItemService {
                 .orElseThrow(() -> new ResearchItemNotFoundException(code));
     }
 
+    @Transactional(readOnly = true)
+    public ResearchItemClaimsResponse findClaimsByCode(String code) {
+        return researchItemRepository.findByCode(code)
+                .map(ResearchItemClaimsResponse::fromEntity)
+                .orElseThrow(() -> new ResearchItemNotFoundException(code));
+    }
+
     @Transactional
     public ResearchItemResponse create(ResearchItemRequest request) {
         ResearchItem item = new ResearchItem();
@@ -46,10 +54,10 @@ public class ResearchItemService {
         if(!code.equals(request.code())) {
             throw new ResearchItemCodeMismatchException(code, request.code());
         }
-        
+
         ResearchItem item = researchItemRepository.findByCode(code)
                 .orElseThrow(() -> new ResearchItemNotFoundException(code));
-        
+
         applyRequest(item, request);
         return ResearchItemResponse.fromEntity(item);
     }
