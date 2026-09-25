@@ -16,7 +16,8 @@
         "vscjava.vscode-java-pack",
         "vmware.vscode-boot-dev-pack",
         "vscjava.vscode-spring-boot-dashboard",
-        "openai.chatgpt"
+        "openai.chatgpt",
+        "cweijan.vscode-postgresql-client2"
       ]
     }
   },
